@@ -1,0 +1,34 @@
+import csv
+import smtplib
+
+def sendMail(to, subject, body, from_mail="tucorreo@gmail.com", password="tucontraseñageneradaporgoogle"):
+    from email.mime.text import MIMEText
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = from_mail
+    msg['To'] = to
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+    s.login(from_mail, password)
+    s.sendmail(from_mail, [to], msg.as_string())
+    s.quit()
+   
+def read_file_for_mail(file_name):
+    with open(file_name) as csvfile:
+        reader = csv.DictReader(csvfile)
+        correos = []
+        nombres = []
+        apellidos = []
+        objetos = []
+        dinero = []
+        for row in reader: # Los siguientes campos son de ejemplo, utiliza los de tu .csv
+            correos.append(row['Correo'])
+            nombres.append(row['Nombre'])
+            apellidos.append(row['Apellidos'])
+            objetos.append(row['Lista de objetos comprados'])
+            dinero.append(row['Importe'])
+
+        for nombre, apellido, correo, objetos, dinero in zip(nombres, apellidos, correos, objetos, dinero):
+            sendMail(correo, "Ticket de compra", f"Hola {nombre} {apellido}, gracias por tu compra de {objetos} por valor de {dinero}") 
+
+read_file_for_mail('Calcul.csv')
